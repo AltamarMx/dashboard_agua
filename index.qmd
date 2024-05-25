@@ -1,0 +1,33 @@
+--- 
+title: "Consumo de agua UTEZ por baños"
+author: "G. Barrios & G. Ramírez"
+format: dashboard
+--- 
+
+```{python}
+import plotly.express as px
+import pandas as pd
+
+
+f = "data/h20.csv"
+agua = pd.read_csv(f,index_col=0,parse_dates=True)
+agua_mensual = agua.resample("ME").sum()
+agua_mensual["total"] = agua_mensual.sum(axis=1)
+agua_mensual["por_h"] = round(agua_mensual.h/agua_mensual.total*100,ndigits=None).astype(int)
+agua_mensual["por_m"] = round(agua_mensual.m/agua_mensual.total*100).astype(int)
+```
+
+## Row {height=60%}
+
+```{python}
+
+fig = px.bar(agua_mensual, x=agua_mensual.index, y=['h', 'm'], title='Consumo mensual de H2O',
+             labels={'value': 'Litros/mes', 'variable': 'Baño'},
+             hover_data={'por_h', 'por_m',"total"})
+
+
+# Actualizar el layout para mejorar la visualización
+fig.update_layout(yaxis_title='Litros/Mes', xaxis_title='Fecha',
+                  xaxis={'type': 'date'})
+
+```
